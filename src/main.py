@@ -1,8 +1,10 @@
 from model import train_model
+import pandas as pd
 
 def main():
     model = train_model()
 
+    #USER INPUT
     age = int(input("Age: "))
     sex = input("Sex (M/F): ").upper()
     studytime = int(input("Study time (1-4): "))
@@ -11,15 +13,29 @@ def main():
     g1 = int(input("G1 grade: "))
     g2 = int(input("G2 grade: "))
 
-    # Encode sex
     sex = 1 if sex == "M" else 0
 
-    # Predict
-    prediction = model.predict([[
-        age, sex, studytime, failures, absences, g1, g2
-    ]])
+    if not (0 <= g1 <= 20 and 0 <= g2 <= 20):
+        print(" G1 and G2 must be between 0 and 20")
+        return
 
-    print(f"Predicted Final Grade (G3): {prediction[0]:.2f}")
+
+    input_df = pd.DataFrame([{
+    "age": age,
+    "sex": sex,
+    "studytime": studytime,
+    "failures": failures,
+    "absences": absences,
+    "G1": g1,
+    "G2": g2
+    }])
+
+    # Predict
+    prediction = model.predict(input_df)
+    prediction = max(0, min(20, prediction[0]))
+
+
+    print(f"Predicted Final Grade (G3): {prediction:.2f}")
 
 if __name__ == "__main__":
     main()
