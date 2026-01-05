@@ -2,7 +2,7 @@ from model import train_model
 import pandas as pd
 
 def main():
-    model = train_model()
+    model,scalar = train_model()
 
     #USER INPUT
     age = int(input("Age: "))
@@ -18,7 +18,10 @@ def main():
     if not (0 <= g1 <= 20 and 0 <= g2 <= 20):
         print(" G1 and G2 must be between 0 and 20")
         return
-
+    
+    avg_marks = (g1 + g2) / 2
+    study_efficiency = studytime / (absences + 1)
+    parent_edu=4
 
     input_df = pd.DataFrame([{
     "age": age,
@@ -27,12 +30,16 @@ def main():
     "failures": failures,
     "absences": absences,
     "G1": g1,
-    "G2": g2
+    "G2": g2,
+    "avg_marks": avg_marks,
+    "study_efficiency": study_efficiency,
+    "parent_edu": parent_edu
     }])
 
+    input_scaled= scalar.transform(input_df)
     # Predict
-    prediction = model.predict(input_df)
-    prediction = max(0, min(20, prediction[0]))
+    prediction = model.predict(input_scaled)[0]
+    prediction = max(0, min(20, prediction))
 
 
     print(f"Predicted Final Grade (G3): {prediction:.2f}")
